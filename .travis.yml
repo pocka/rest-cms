@@ -1,0 +1,18 @@
+sudo: required
+
+language: go
+
+services:
+  - docker
+
+script:
+  - make
+  - make container/deploy
+  - make coverage.txt
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
+  - if ["$TRAVIS_BRANCH" == "master"]; then
+    docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD";
+    docker push pocka/rest-cms;
+    fi
