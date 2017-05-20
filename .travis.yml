@@ -11,8 +11,7 @@ script:
   - make coverage.txt
 
 after_success:
-  - ls -la;
-    bash <(curl -s https://codecov.io/bash) -f coverage.txt
+  - bash <(curl -s https://codecov.io/bash) -f coverage.txt
   - if [ "$TRAVIS_BRANCH" == "master" ]; then
     docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD";
     docker push pocka/rest-cms;
