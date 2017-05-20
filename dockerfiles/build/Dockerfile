@@ -4,3 +4,5 @@ MAINTAINER pocka <pockawoooh@gmail.com>
 
 RUN apk --update add \
         git gcc musl-dev
+
+RUN go get gopkg.in/gin-gonic/gin.v1
