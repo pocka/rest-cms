@@ -1,12 +1,16 @@
 package main
 
 import (
-	"net/http"
-
 	"gopkg.in/gin-gonic/gin.v1"
 )
 
 func main(){
+	// Run server
+	NewServer().Run(":80")
+}
+
+// Creates and returns server
+func NewServer() *gin.Engine {
 	router := gin.New()
 
 	// Specify middleware
@@ -16,11 +20,10 @@ func main(){
 	// Bind routes
 	router.GET("/ping", ping)
 
-	// Run server
-	router.Run(":80")
+	return router
 }
 
 // Health check api
 func ping(c *gin.Context) {
-	c.String(http.StatusOK, "pong!")
+	c.String(200, "pong!")
 }
