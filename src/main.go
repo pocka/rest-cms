@@ -9,12 +9,18 @@ import (
 func main(){
 	router := gin.New()
 
+	// Specify middleware
 	router.Use(gin.Logger())
 	router.Use(gin.Recovery())
 
-	router.GET("/ping", func(c *gin.Context) {
-		c.String(http.StatusOK, "pong!")
-	})
+	// Bind routes
+	router.GET("/ping", ping)
 
+	// Run server
 	router.Run(":80")
+}
+
+// Health check api
+func ping(c *gin.Context) {
+	c.String(http.StatusOK, "pong!")
 }
