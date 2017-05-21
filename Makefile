@@ -21,25 +21,21 @@ GO_BUILDOPTS = -a \
 GO_BUILDENV  = CGO_ENABLED=0 \
 			   GOOS=linux
 
-GO = docker run \
-	 --rm \
-	 -v $(shell pwd):$(WORKDIR) \
-	 -w $(WORKDIR) \
-	 -u $(shell id -u):$(shell id -g) \
-	 $(addprefix -e ,$(GO_BUILDENV)) \
-	 $(DOCKER_IMAGE_BUILD) \
-	 go
+DOCKER_RUN = docker run \
+			 --rm \
+			 -v $(shell pwd):$(WORKDIR) \
+			 -w $(WORKDIR) \
+			 -u $(shell id -u):$(shell id -g) \
+			 $(addprefix -e ,$(GO_BUILDENV)) \
+			 $(DOCKER_IMAGE_BUILD)
+
+GO = $(DOCKER_RUN) go
 
 GO_BUILD = $(GO) build $(GO_BUILDOPTS)
 GO_TEST  = $(GO) test -v ./...
+GOFMT    = $(DOCKER_RUN) gofmt
 
-GOFMT = docker run \
-		--rm \
-		-v $(shell pwd):$(WORKDIR) \
-		-w $(WORKDIR) \
-		-u $(shell id -u):$(shell id -g) \
-		$(DOCKER_IMAGE_BUILD) \
-		gofmt
+GOMETALINTER = $(DOCKER_RUN) gometalinter.v1
 
 # -------------------------------------------- #
 
@@ -59,6 +55,11 @@ coverage.txt: $(GO_FILES) container/build
 .PHONY: test
 test: $(GO_FILES) container/build
 	$(GO_TEST)
+
+
+.PHONY: lint
+lint: container/build
+	$(GOMETALINTER) ./...
 
 
 .PHONY: container/build

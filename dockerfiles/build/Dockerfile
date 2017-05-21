@@ -7,4 +7,6 @@ RUN apk --update add \
 
 RUN go get gopkg.in/gin-gonic/gin.v1 && \
 	go get github.com/appleboy/gofight && \
-	go get github.com/stretchr/testify/assert
+	go get github.com/stretchr/testify/assert && \
+	go get gopkg.in/alecthomas/gometalinter.v1 && \
+	/go/bin/gometalinter.v1 --install
