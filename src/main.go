@@ -1,12 +1,18 @@
 package main
 
 import (
+	"fmt"
+
 	"gopkg.in/gin-gonic/gin.v1"
 )
 
 func main() {
 	// Run server
-	NewServer().Run(":80")
+	err := NewServer().Run(":80")
+
+	if err != nil {
+		fmt.Printf("Failed to run server: %s", err)
+	}
 }
 
 // NewServer creates and returns server
