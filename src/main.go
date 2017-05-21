@@ -4,7 +4,7 @@ import (
 	"gopkg.in/gin-gonic/gin.v1"
 )
 
-func main(){
+func main() {
 	// Run server
 	NewServer().Run(":80")
 }
