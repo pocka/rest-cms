@@ -9,7 +9,7 @@ func main() {
 	NewServer().Run(":80")
 }
 
-// Creates and returns server
+// NewServer creates and returns server
 func NewServer() *gin.Engine {
 	router := gin.New()
 
