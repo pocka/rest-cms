@@ -33,9 +33,18 @@ GO = docker run \
 GO_BUILD = $(GO) build $(GO_BUILDOPTS)
 GO_TEST  = $(GO) test -v ./...
 
+GOFMT = docker run \
+		--rm \
+		-v $(shell pwd):$(WORKDIR) \
+		-w $(WORKDIR) \
+		-u $(shell id -u):$(shell id -g) \
+		$(DOCKER_IMAGE_BUILD) \
+		gofmt
+
 # -------------------------------------------- #
 
 bin/rest-cms: bin $(GO_FILES) container/build
+	$(GOFMT) -s -w $(GO_FILES)
 	$(GO_BUILD) -o $@ src/main.go
 
 
