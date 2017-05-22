@@ -1,0 +1,379 @@
+swagger: '2.0'
+info:
+  title: RESTful CMS for my website
+  description: |
+    This is a CMS that does not render any views but returns page date in json.
+  version: 1.0.0
+host: cms.article.pocka.io
+basePath: /v1
+schemes:
+  - https
+consumes:
+  - application/json; charset=utf-8
+produces:
+  - application/json; charset=utf-8
+tags:
+  - name: auth
+    description: Operations for authorization
+  - name: content
+    description: Operations for contents
+paths:
+  /token:
+    get:
+      tags:
+        - auth
+      description: |
+        returns token for user
+      security:
+        - Basic: []
+      responses:
+        '200':
+          description: access token and refresh token
+          schema:
+            type: object
+            properties:
+              access_token:
+                type: string
+              refresh_token:
+                type: string
+  /token/access_token:
+    get:
+      tags:
+        - auth
+      description: |
+        returns access token
+      security:
+        - Token: []
+      produces:
+        - text/plain
+      responses:
+        '200':
+          description: access token
+          schema:
+            type: string
+  /contents:
+    get:
+      tags:
+        - content
+      description: |
+        Get list metadata of contents
+      parameters:
+        - name: tag
+          in: query
+          type: string
+          description: Filter contents by the tag
+        - name: sort
+          in: query
+          type: string
+          description: Sort field.
+        - name: order
+          in: query
+          type: string
+          enum:
+            - asc
+            - desc
+          description: Sort order. asc or desc
+      responses:
+        '200':
+          description: metadata list of contents
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/FullMetadata'
+    post:
+      tags:
+        - content
+      description: |
+        Create new content
+      security:
+        - Token: []
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              contents:
+                $ref: '#/definitions/Content'
+              metadata:
+                $ref: '#/definitions/Metadata'
+      responses:
+        '201':
+          description: Content created successfully
+  '/contents/{title}':
+    get:
+      tags:
+        - content
+      description: Get specific content
+      parameters:
+        - name: title
+          in: path
+          required: true
+          description: |
+            URL encoded content title
+          type: string
+      responses:
+        '200':
+          description: Content
+          schema:
+            type: object
+            properties:
+              metadata:
+                $ref: '#/definitions/FullMetadata'
+              content:
+                $ref: '#/definitions/Content'
+              comments:
+                type: array
+                items:
+                  $ref: '#/definitions/Comment'
+    put:
+      tags:
+        - content
+      description: Update specific content
+      security:
+        - Token: []
+      parameters:
+        - name: title
+          in: path
+          required: true
+          description: |
+            URL encoded content title
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              metadata:
+                $ref: '#/definitions/Metadata'
+              content:
+                $ref: '#/definitions/Content'
+      responses:
+        '204':
+          description: |
+            Updated successfully
+    delete:
+      tags:
+        - content
+      description: Delete specific content
+      security:
+        - Token: []
+      parameters:
+        - name: title
+          in: path
+          required: true
+          description: |
+            URL encoded content title
+          type: string
+      responses:
+        '204':
+          description: |
+            Deleted successfully
+  '/contents/{title}/comments':
+    get:
+      tags:
+        - content
+      description: Get comments for the specific content
+      parameters:
+        - name: title
+          in: path
+          required: true
+          description: |
+            URL encoded content title
+          type: string
+      responses:
+        '200':
+          description: A list of comments.
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Comment'
+    post:
+      tags:
+        - content
+      description: Post new comment for the specific content
+      security:
+        - Token: []
+      parameters:
+        - name: title
+          in: path
+          required: true
+          description: |
+            URL encoded content title
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              comment:
+                description: |
+                  Comment strings.
+                type: string
+              oauth_provider:
+                description: |
+                  Supported OAuth2 provider.
+                type: string
+                enum:
+                  - google
+                  - github
+                  - facebook
+      responses:
+        '201':
+          description: |
+            Posted successfully
+    delete:
+      tags:
+        - content
+      description: Delete specific comment.
+      security:
+        - Token: []
+      parameters:
+        - name: title
+          in: path
+          required: true
+          description: |
+            URL encoded content title
+          type: string
+      responses:
+        '201':
+          description: |
+            Deleted successfully
+definitions:
+  Content:
+    description: |
+      Content itself. Content format could be json, markdown, html, and so.
+      You MUST specify its format in type field.
+    type: object
+    properties:
+      type:
+        type: string
+        description: Contents format
+        example: json
+      content:
+        type: object
+        description: Contents formatted with specified in `type`
+        example:
+          - type: Heading
+            props:
+              level: 1
+            value:
+              - type: Text
+                value: Some heading here
+          - type: Paragraph
+            value:
+              - type: Text
+                value: 'Lorem ipsum dolor sit amet, consectetur adipiscing'
+              - type: Code
+                props:
+                  inline: true
+                  lang: javascript
+                value: var x = y;
+              - type: Text
+                value: 'elit, sed do eiusmod tempor incididunt ut labore et'
+  Comment:
+    description: |
+      Comment.
+      Posting comment needs admin user login or OAuth2 authZ.
+    type: object
+    properties:
+      id:
+        description: |
+          An unique id for the comment.
+        type: string
+        example: '0001'
+      user:
+        description: |
+          Comment owner.
+          Represented in USERNAME@OAUTH_PROVIDER_NAME
+        type: string
+        example: pocka@twitter
+      content:
+        description: |
+          Comment body.
+        type: string
+        example: 'Hi, site owner!'
+      oauth_provider:
+        description: |
+          Supported OAuth2 provider
+        type: string
+        enum:
+          - google
+          - github
+          - facebook
+        example: github
+  Metadata:
+    description: |
+      Metadata for content that user can modify.
+    type: object
+    properties:
+      title:
+        description: |
+          Title for the content.
+        type: string
+        example: How to write interface in Typescript
+      tags:
+        description: |
+          Tags for the content.
+        type: array
+        items:
+          type: string
+      other:
+        description: |
+          Other metadata.
+        type: object
+        example:
+          author: pocka
+  FullMetadata:
+    description: |
+      Metadata for content.
+    type: object
+    properties:
+      id:
+        description: |
+          ID for the content. Random and immutable.
+        type: string
+        example: 4RTX-09JI-BBNA-596X
+      title:
+        description: |
+          Title for the content.
+        type: string
+        example: How to write interface in Typescript
+      revision:
+        description: |
+          Revision id for the content. If history is disabled, null comes here.
+        type: string
+        example: 09a7i893g8asd0
+      created_at:
+        description: |
+          Datetime when the content created at. ISO-8601(yyyy-MM-ddTHH:mm:ssZ)
+        type: string
+        example: '2017-05-21T17:58:49+09:00'
+      last_update:
+        description: >
+          Datetime when the content last updated at.
+          ISO-8601(yyyy-MM-ddTHH:mm:ssZ)
+        type: string
+        example: '2017-05-21T20:06:03+09:00'
+      tags:
+        description: |
+          Tags for the content.
+        type: array
+        items:
+          type: string
+      other:
+        description: |
+          Other metadata
+        type: object
+        example:
+          author: pocka
+securityDefinitions:
+  Basic:
+    type: basic
+  Token:
+    type: apiKey
+    in: header
+    name: Authorization
