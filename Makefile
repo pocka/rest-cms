@@ -62,11 +62,13 @@ coverage.txt: $(GO_FILES) container/build
 
 .PHONY: test
 test: $(GO_FILES) container/build
+	$(GOFMT) -s -w $(GO_FILES)
 	$(GO_TEST) -v ./...
 
 
 .PHONY: lint
 lint: container/build
+	$(GOFMT) -s -w $(GO_FILES)
 	$(GOMETALINTER) ./...
 
 
