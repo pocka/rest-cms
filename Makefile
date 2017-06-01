@@ -70,7 +70,7 @@ test: $(GO_FILES) container/build
 .PHONY: lint
 lint: container/build
 	$(GOFMT) -s -w $(GO_FILES)
-	$(GOMETALINTER) ./...
+	$(GOMETALINTER) --disable gotype ./...
 
 
 .PHONY: container/build
