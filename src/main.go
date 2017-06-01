@@ -28,7 +28,9 @@ func NewServer() *gin.Engine {
 	// Bind routes
 	router.GET("/ping", ping)
 
-	v1.Bind(router)
+	if err := v1.Bind(router); err != nil {
+		fmt.Printf("Error: %s", err)
+	}
 
 	return router
 }
