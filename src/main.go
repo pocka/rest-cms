@@ -4,6 +4,8 @@ import (
 	"fmt"
 
 	"gopkg.in/gin-gonic/gin.v1"
+
+	"github.com/pocka/rest-cms/src/v1"
 )
 
 func main() {
@@ -25,6 +27,8 @@ func NewServer() *gin.Engine {
 
 	// Bind routes
 	router.GET("/ping", ping)
+
+	v1.Bind(router)
 
 	return router
 }
