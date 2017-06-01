@@ -227,9 +227,9 @@ func TestVerifyRefreshTokenNGInvalidIssuedAt(t *testing.T) {
 	issuedAt := time.Now().Local().Add(time.Minute * 5).Unix()
 
 	token, _ := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
-		IssuedAt:  issuedAt,
-		Issuer:    jwtIssuer,
-		Subject:   jwtRefreshTokenSubject,
+		IssuedAt: issuedAt,
+		Issuer:   jwtIssuer,
+		Subject:  jwtRefreshTokenSubject,
 	}).SignedString(secret)
 
 	err := verifyRefreshToken(secret, token)
@@ -243,9 +243,9 @@ func TestVerifyRefreshTokenNGInvalidIssuer(t *testing.T) {
 	issuedAt := time.Now().Local().Add(time.Minute * -10).Unix()
 
 	token, _ := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
-		IssuedAt:  issuedAt,
-		Issuer:    "rest-cms",
-		Subject:   jwtRefreshTokenSubject,
+		IssuedAt: issuedAt,
+		Issuer:   "rest-cms",
+		Subject:  jwtRefreshTokenSubject,
 	}).SignedString(secret)
 
 	err := verifyRefreshToken(secret, token)
@@ -270,4 +270,3 @@ func TestVerifyRefreshTokenNGPassedAccessToken(t *testing.T) {
 
 	assert.NotNil(t, err)
 }
-

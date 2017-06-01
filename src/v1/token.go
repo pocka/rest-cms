@@ -2,11 +2,9 @@ package v1
 
 import (
 	"fmt"
-	"regexp"
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
-	"gopkg.in/gin-gonic/gin.v1"
 )
 
 const (
@@ -37,34 +35,10 @@ func generateRefreshToken(secret []byte) (string, error) {
 	}
 
 	return jwt.NewWithClaims(jwt.SigningMethodHS256, &jwt.StandardClaims{
-		IssuedAt:  time.Now().Local().Unix(),
-		Issuer:    jwtIssuer,
-		Subject:   jwtRefreshTokenSubject,
+		IssuedAt: time.Now().Local().Unix(),
+		Issuer:   jwtIssuer,
+		Subject:  jwtRefreshTokenSubject,
 	}).SignedString(secret)
-}
-
-// Returns access token and refresh token for admin user
-func getAdminToken(c *gin.Context) {
-	secret := []byte("admin")
-
-	accessToken, err := generateAccessToken(secret)
-
-	if err != nil {
-		c.JSON(500, gin.H{"error": "Failed to generate access token"})
-		return
-	}
-
-	refreshToken, err := generateRefreshToken(secret)
-
-	if err != nil {
-		c.JSON(500, gin.H{"error": "Failed to generate refresh token"})
-		return
-	}
-
-	c.JSON(200, gin.H{
-		"access_token":  accessToken,
-		"refresh_token": refreshToken,
-	})
 }
 
 func verifyAccessToken(secret []byte, tokenString string) error {
@@ -133,29 +107,4 @@ func verifyRefreshToken(secret []byte, tokenString string) error {
 	}
 
 	return nil
-}
-
-// Get new access token using refresh token
-func refreshAccessToken(c *gin.Context) {
-	secret := []byte("admin")
-
-	authHeader := c.Request.Header.Get("Authorization")
-
-	refreshToken := regexp.MustCompile(`^Bearer\s`).ReplaceAllString(authHeader, "")
-
-	err := verifyRefreshToken(secret, refreshToken)
-
-	if err != nil {
-		c.JSON(401, gin.H{"error": "Invalid refresh token"})
-		return
-	}
-
-	accessToken, err := generateAccessToken(secret)
-
-	if err != nil {
-		c.JSON(500, gin.H{"error": "Failed to generate access token"})
-		return
-	}
-
-	c.String(200, accessToken)
 }
