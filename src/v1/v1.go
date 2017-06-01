@@ -25,7 +25,7 @@ func Bind(router *gin.Engine) error {
 	return nil
 }
 
-// Build admin account from enviromental variables
+// Build admin account from environmental variables
 // ADMIN_NAME ... Name of admin user (required).
 // ADMIN_PASS ... Password for admin user (required).
 func buildAdminAccounts() (map[string]string, error) {
