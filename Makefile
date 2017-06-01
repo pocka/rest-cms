@@ -28,6 +28,7 @@ DOCKER_RUN = docker run \
 			 -w $(WORKDIR) \
 			 -u $(shell id -u):$(shell id -g) \
 			 $(addprefix -e ,$(GO_BUILDENV)) \
+			 --env-file default.env \
 			 $(DOCKER_IMAGE_BUILD)
 
 GO = $(DOCKER_RUN) go
@@ -69,7 +70,7 @@ test: $(GO_FILES) container/build
 .PHONY: lint
 lint: container/build
 	$(GOFMT) -s -w $(GO_FILES)
-	$(GOMETALINTER) ./...
+	$(GOMETALINTER) --disable gotype ./...
 
 
 .PHONY: container/build
