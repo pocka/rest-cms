@@ -28,6 +28,7 @@ DOCKER_RUN = docker run \
 			 -w $(WORKDIR) \
 			 -u $(shell id -u):$(shell id -g) \
 			 $(addprefix -e ,$(GO_BUILDENV)) \
+			 --env-file default.env \
 			 $(DOCKER_IMAGE_BUILD)
 
 GO = $(DOCKER_RUN) go
