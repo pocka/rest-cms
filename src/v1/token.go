@@ -56,18 +56,6 @@ func verifyAccessToken(secret []byte, tokenString string) error {
 		return fmt.Errorf(`Invalid token`)
 	}
 
-	now := time.Now().Unix()
-
-	if !claims.VerifyExpiresAt(now, true) {
-		delta := time.Unix(now, 0).Sub(time.Unix(claims.ExpiresAt, 0))
-
-		return fmt.Errorf(`Token is expired by %v`, delta)
-	}
-
-	if !claims.VerifyIssuedAt(now, true) {
-		return fmt.Errorf(`Token used before issued`)
-	}
-
 	if !claims.VerifyIssuer(jwtIssuer, true) {
 		return fmt.Errorf(`Invalid token issuer was passed`)
 	}
@@ -92,10 +80,6 @@ func verifyRefreshToken(secret []byte, tokenString string) error {
 
 	if !(ok && token.Valid && err == nil) {
 		return fmt.Errorf(`Invalid token`)
-	}
-
-	if !claims.VerifyIssuedAt(time.Now().Unix(), true) {
-		return fmt.Errorf(`Token used before issued`)
 	}
 
 	if !claims.VerifyIssuer(jwtIssuer, true) {
