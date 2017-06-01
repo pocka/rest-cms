@@ -91,4 +91,3 @@ func refreshAccessToken(c *gin.Context) {
 
 	c.String(200, accessToken)
 }
-
